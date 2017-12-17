@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Java,try-catch-finally," />
+  <meta name="keywords" content="Java,try-catch-finally,面试," />
 
 
 
@@ -80,14 +80,14 @@
 
 
 <meta name="description" content="问题描述：12345678910111213求问如下代码的输出结果？    public class Test &amp;#123;        public int i = 0;        public int getI() &amp;#123;            try &amp;#123;                return i;            &amp;#125; catch (Exceptio">
-<meta name="keywords" content="Java,try-catch-finally">
+<meta name="keywords" content="Java,try-catch-finally,面试">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一道关于 try-catch-finally 的面试">
 <meta property="og:url" content="http://yoursite.com/2017/03/04/try-catch-finally/index.html">
 <meta property="og:site_name" content="YSCONTIGO&#39;S REST HOME">
 <meta property="og:description" content="问题描述：12345678910111213求问如下代码的输出结果？    public class Test &amp;#123;        public int i = 0;        public int getI() &amp;#123;            try &amp;#123;                return i;            &amp;#125; catch (Exceptio">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-12-17T15:45:21.000Z">
+<meta property="og:updated_time" content="2017-12-17T15:53:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一道关于 try-catch-finally 的面试">
 <meta name="twitter:description" content="问题描述：12345678910111213求问如下代码的输出结果？    public class Test &amp;#123;        public int i = 0;        public int getI() &amp;#123;            try &amp;#123;                return i;            &amp;#125; catch (Exceptio">
@@ -363,6 +363,7 @@
 
       
         <h4 id="问题描述："><a href="#问题描述：" class="headerlink" title="问题描述："></a>问题描述：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">求问如下代码的输出结果？</span><br><span class="line">    public class Test &#123;</span><br><span class="line">        public int i = 0;</span><br><span class="line">        public int getI() &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                return i;</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125; finally &#123;</span><br><span class="line">                i ++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>相信有点技术内涵的面试者都知道面试官在考察 finally 的点。<br>但看似简单的一道题，其实可考察的的技术细节很多，可以说是一道很好的面试题。<br>虽说这道题看似不难，可能基础好的面试者给出的答案为 i = 0， 可能还有些面试者给出的答案为 i = 1（显然这个是肯定错误的答案）， 可能还有些面试者给出的答案是 编译错误。</p>
 <p>那答案到底是 i = 0 还是 编译错误的呢？ 当然就要看面试官考察的点了，其实将上述这段代码在 IDE 中敲一下，的确会报错误，<strong>因为 getI() 方法没有全覆盖的返回值</strong>，不知道是面试官本身不行，还是故意为之，这就不得而知了。</p>
 <p>不过即使不知道面试官的真正意图，但面试者如果在面试时足够镇静，还是可以给出一个完美的答案的。<br>比如：面试官你好，这道题我觉得可以分情况考虑，一，如果单从代码来看，这段代码会编译错误，因为 catch 语句块中没有 return， getI() 方法是不完整的；二，如果 catch 中加上 return 语句后，我认为答案是 i = 0。</p>
@@ -394,6 +395,8 @@
             <a href="/tags/Java/" rel="tag"># Java</a>
           
             <a href="/tags/try-catch-finally/" rel="tag"># try-catch-finally</a>
+          
+            <a href="/tags/面试/" rel="tag"># 面试</a>
           
         </div>
       
@@ -517,7 +520,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
