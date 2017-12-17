@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-Hans">
+<html class="theme-next mist use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -96,7 +96,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Mist',
     version: '5.1.3',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
@@ -258,6 +258,166 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/27/2017-10-26-@Autowired 推荐构造函数注入/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lanqiu5ge">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/profile_pic.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YSCONTIGO'S REST HOME">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/27/2017-10-26-@Autowired 推荐构造函数注入/" itemprop="url">深究推荐 @Autowired 对构造函数注解的原因</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-27T14:25:26+08:00">
+                2017-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>最近在开发的时候，使用 @Autowired 注解 Field，发现 IDE 报了一个警告，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Spring Team recommends &quot;Always use constructor based dependency injection in your beans. Always use assertions for mandatory dependencies&quot;.</span><br></pre></td></tr></table></figure></p>
+<p>翻译后的大概意思就是：<br>Spring 团队建议：总是在您的 bean 中使用构造函数建立依赖注入。总是使用断言强制依赖。</p>
+<p>原来的写法是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@Controller</span><br><span class="line">public class UserController &#123;</span><br><span class="line">	@Autowired</span><br><span class="line">	private UserService userService;</span><br><span class="line"></span><br><span class="line">	@RequestMapping(value = &quot;/get&quot;)</span><br><span class="line">	public @ResponseBody getUser()</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line">``` </span><br><span class="line">这样写就会出现上边那个警告。</span><br><span class="line">按照 Spring 团队建议的写法是：</span><br></pre></td></tr></table></figure></p>
+<p>public class A {<br>    /**</p>
+<pre><code> *    注意多添加了一个 final 修饰
+ */
+private final B b；
+
+@Autowired
+public A(B b) {
+    this.b = b;
+}
+...
+</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@Autowired 明明可以对 Constructor，Fileld， Setter Methods or config Methods 进行注释。</span><br><span class="line">那么为什么这里有这样的提示？对 Field 和 对 Constructor 进行注释有什么区别呢？</span><br><span class="line"></span><br><span class="line">为了解答以上疑惑，还得结合 JVM 中对 Java 变量的初始化顺序进行分析：</span><br><span class="line">**Java变量的初始化顺序为：**</span><br><span class="line">静态变量或静态语句块 –&gt; 实例变量或初始化语句块 –&gt; 构造方法 –&gt; @Autowired</span><br><span class="line"></span><br><span class="line">所以，若有如下代码：</span><br><span class="line"></span><br><span class="line">B.java 文件</span><br></pre></td></tr></table></figure></p>
+<p>@Getter<br>@Setter<br>@Service<br>public class B {</p>
+<pre><code>private String name;
+
+private int age;
+
+public User(){}
+
+public User(String name, int age) {
+    this.name = name;
+    this.age = age;
+}
+
+@Override
+public String toString() {
+    return &quot;Name=&quot; + name + &quot;, Age=&quot; + age;
+ }
+</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">A.java 文件</span><br></pre></td></tr></table></figure></p>
+<p>public class A {<br>    private String name;</p>
+<pre><code>@Autowired
+private B b;
+
+public A() {
+    this.name = b.getName();    
+}
+...
+</code></pre><p>}<br>```<br>能正常完成编译，但是运行时会抛出 NPE。</p>
+<p>被 @Autowired 注解的 Field 的底层注入流程可以理解为在配置文件中配置 bean，然后使用 setter 注入。<br>而被 @Autowired 注解的 Constructor 的底层注入流程就相当于是使用构造函数进行依赖注入了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
     
       
 
@@ -563,6 +723,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/26/2017-03-05-XML CDATA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lanqiu5ge">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/profile_pic.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YSCONTIGO'S REST HOME">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/26/2017-03-05-XML CDATA/" itemprop="url">XML CDATA</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-26T20:56:58+08:00">
+                2017-10-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>所有 XML 文档中的文本均会被解析器解析。<br>只有 CDATA 区段（CDATA section）中的文本会被解析器忽略。</strong></p>
+<h4 id="PCDATA"><a href="#PCDATA" class="headerlink" title="PCDATA"></a><strong>PCDATA</strong></h4><p>PCDATA 指的是被解析的字符数据（Parsed Character Data）。<br>XML 解析器通常会解析 XML 文档中所有的文本。<br>当某个 XML 元素被解析时，其标签之间的文本也会被解析：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;message&gt;此文本也会被解析&lt;/message&gt;</span><br></pre></td></tr></table></figure></p>
+<p>解析器之所以这么做是因为 XML 元素可包含其他元素，就像这个例子中，其中的 元素包含着另外的两个元素(first 和 last)：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;name&gt;&lt;first&gt;Bill&lt;/first&gt;&lt;last&gt;Gates&lt;/last&gt;&lt;/name&gt;</span><br></pre></td></tr></table></figure></p>
+<p>而解析器会把它分解为像这样的子元素：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   &lt;name&gt;</span><br><span class="line">  		&lt;first&gt;Bill&lt;/first&gt;</span><br><span class="line">  		&lt;last&gt;Gates&lt;/last&gt;</span><br><span class="line">&lt;/name&gt;</span><br></pre></td></tr></table></figure></p>
+<h4 id="转义字符"><a href="#转义字符" class="headerlink" title="转义字符"></a><strong>转义字符</strong></h4><p><strong>非法的 XML 字符必须被替换为实体引用（entity reference）。</strong><br>假如您在 XML 文档中放置了一个类似 “&lt;” 字符，那么这个文档会产生一个错误，这是因为解析器会把它解释为新元素的开始。因此你不能这样写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;message&gt;if salary &lt; 1000 then&lt;/message&gt;</span><br></pre></td></tr></table></figure></p>
+<p>为了避免此类错误，需要把字符 “&lt;” 替换为实体引用，就像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;message&gt;if salary &amp;lt; 1000 then&lt;/message&gt;</span><br></pre></td></tr></table></figure></p>
+<p>在 XML 中有 5 个预定义的实体引用：  </p>
+<table>
+<thead>
+<tr>
+<th>\&lt;</th>
+<th>&lt;</th>
+<th>小于</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>\&gt;</td>
+<td>&gt;</td>
+<td>大于</td>
+</tr>
+<tr>
+<td>\&amp;</td>
+<td>&amp;</td>
+<td>和号</td>
+</tr>
+<tr>
+<td>\&apos;</td>
+<td>.</td>
+<td>省略号</td>
+</tr>
+<tr>
+<td>\&quot;</td>
+<td>‘’</td>
+<td>引号</td>
+</tr>
+</tbody>
+</table>
+<p><strong>注释：</strong>  严格地讲，在 XML 中仅有字符 “&lt;”和”&amp;” 是非法的。省略号、引号和大于号是合法的，但是把它们替换为实体引用是个好的习惯。</p>
+<h4 id="CDATA"><a href="#CDATA" class="headerlink" title="CDATA"></a><strong>CDATA</strong></h4><p><strong>术语 CDATA 指的是不应由 XML 解析器进行解析的文本数据（Unparsed Character Data）。</strong><br>在 XML 元素中，”&lt;” 和 “&amp;” 是非法的。<br>“&lt;” 会产生错误，因为解析器会把该字符解释为新元素的开始。<br>“&amp;” 也会产生错误，因为解析器会把该字符解释为字符实体的开始。<br>某些文本，比如 JavaScript 代码，包含大量 “&lt;” 或 “&amp;” 字符。为了避免错误，可以将脚本代码定义为 CDATA。<br>CDATA 部分中的所有内容都会被解析器忽略。<br>CDATA 部分由 “<strong>&lt;![CDATA[</strong>“ 开始，由 “<strong>]]&gt;</strong>“ 结束：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">&lt;![CDATA[</span><br><span class="line">function matchwo(a,b) &#123;</span><br><span class="line">   	if (a &lt; b &amp;&amp; a &lt; 0) then &#123;</span><br><span class="line">      		return 1;</span><br><span class="line">   	&#125; else &#123;</span><br><span class="line">       	return 0;</span><br><span class="line">   	&#125;</span><br><span class="line">&#125;</span><br><span class="line">]]&gt;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure></p>
+<p>在上面的例子中，解析器会忽略 CDATA 部分中的所有内容。<br><strong>关于 CDATA 部分的注释：</strong><br>CDATA 部分不能包含字符串 “]]&gt;”。也不允许嵌套的 CDATA 部分。<br>标记 CDATA 部分结尾的 “]]&gt;” 不能包含空格或折行。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/26/2017-03-04-try-catch-finally/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -694,7 +1014,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/26/2017-03-05-XML CDATA/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/19/linux指令-cUrl/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="lanqiu5ge">
@@ -713,7 +1033,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/10/26/2017-03-05-XML CDATA/" itemprop="url">XML CDATA</a></h1>
+                <a class="post-title-link" href="/2017/06/19/linux指令-cUrl/" itemprop="url">未命名</a></h1>
         
 
         <div class="post-meta">
@@ -725,8 +1045,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-26T20:56:58+08:00">
-                2017-10-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-19T20:07:28+08:00">
+                2017-06-19
               </time>
             
 
@@ -765,47 +1085,431 @@
       
         
           
-            <p><strong>所有 XML 文档中的文本均会被解析器解析。<br>只有 CDATA 区段（CDATA section）中的文本会被解析器忽略。</strong></p>
-<h4 id="PCDATA"><a href="#PCDATA" class="headerlink" title="PCDATA"></a><strong>PCDATA</strong></h4><p>PCDATA 指的是被解析的字符数据（Parsed Character Data）。<br>XML 解析器通常会解析 XML 文档中所有的文本。<br>当某个 XML 元素被解析时，其标签之间的文本也会被解析：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;message&gt;此文本也会被解析&lt;/message&gt;</span><br></pre></td></tr></table></figure></p>
-<p>解析器之所以这么做是因为 XML 元素可包含其他元素，就像这个例子中，其中的 元素包含着另外的两个元素(first 和 last)：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;name&gt;&lt;first&gt;Bill&lt;/first&gt;&lt;last&gt;Gates&lt;/last&gt;&lt;/name&gt;</span><br></pre></td></tr></table></figure></p>
-<p>而解析器会把它分解为像这样的子元素：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   &lt;name&gt;</span><br><span class="line">  		&lt;first&gt;Bill&lt;/first&gt;</span><br><span class="line">  		&lt;last&gt;Gates&lt;/last&gt;</span><br><span class="line">&lt;/name&gt;</span><br></pre></td></tr></table></figure></p>
-<h4 id="转义字符"><a href="#转义字符" class="headerlink" title="转义字符"></a><strong>转义字符</strong></h4><p><strong>非法的 XML 字符必须被替换为实体引用（entity reference）。</strong><br>假如您在 XML 文档中放置了一个类似 “&lt;” 字符，那么这个文档会产生一个错误，这是因为解析器会把它解释为新元素的开始。因此你不能这样写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;message&gt;if salary &lt; 1000 then&lt;/message&gt;</span><br></pre></td></tr></table></figure></p>
-<p>为了避免此类错误，需要把字符 “&lt;” 替换为实体引用，就像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;message&gt;if salary &amp;lt; 1000 then&lt;/message&gt;</span><br></pre></td></tr></table></figure></p>
-<p>在 XML 中有 5 个预定义的实体引用：  </p>
-<table>
-<thead>
-<tr>
-<th>\&lt;</th>
-<th>&lt;</th>
-<th>小于</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>\&gt;</td>
-<td>&gt;</td>
-<td>大于</td>
-</tr>
-<tr>
-<td>\&amp;</td>
-<td>&amp;</td>
-<td>和号</td>
-</tr>
-<tr>
-<td>\&apos;</td>
-<td>.</td>
-<td>省略号</td>
-</tr>
-<tr>
-<td>\&quot;</td>
-<td>‘’</td>
-<td>引号</td>
-</tr>
-</tbody>
-</table>
-<p><strong>注释：</strong>  严格地讲，在 XML 中仅有字符 “&lt;”和”&amp;” 是非法的。省略号、引号和大于号是合法的，但是把它们替换为实体引用是个好的习惯。</p>
-<h4 id="CDATA"><a href="#CDATA" class="headerlink" title="CDATA"></a><strong>CDATA</strong></h4><p><strong>术语 CDATA 指的是不应由 XML 解析器进行解析的文本数据（Unparsed Character Data）。</strong><br>在 XML 元素中，”&lt;” 和 “&amp;” 是非法的。<br>“&lt;” 会产生错误，因为解析器会把该字符解释为新元素的开始。<br>“&amp;” 也会产生错误，因为解析器会把该字符解释为字符实体的开始。<br>某些文本，比如 JavaScript 代码，包含大量 “&lt;” 或 “&amp;” 字符。为了避免错误，可以将脚本代码定义为 CDATA。<br>CDATA 部分中的所有内容都会被解析器忽略。<br>CDATA 部分由 “<strong>&lt;![CDATA[</strong>“ 开始，由 “<strong>]]&gt;</strong>“ 结束：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">&lt;![CDATA[</span><br><span class="line">function matchwo(a,b) &#123;</span><br><span class="line">   	if (a &lt; b &amp;&amp; a &lt; 0) then &#123;</span><br><span class="line">      		return 1;</span><br><span class="line">   	&#125; else &#123;</span><br><span class="line">       	return 0;</span><br><span class="line">   	&#125;</span><br><span class="line">&#125;</span><br><span class="line">]]&gt;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure></p>
-<p>在上面的例子中，解析器会忽略 CDATA 部分中的所有内容。<br><strong>关于 CDATA 部分的注释：</strong><br>CDATA 部分不能包含字符串 “]]&gt;”。也不允许嵌套的 CDATA 部分。<br>标记 CDATA 部分结尾的 “]]&gt;” 不能包含空格或折行。</p>
+            <h3 id="cUrl-介绍"><a href="#cUrl-介绍" class="headerlink" title="cUrl 介绍"></a>cUrl 介绍</h3><p><a href="https://curl.haxx.se/" target="_blank" rel="noopener">cUrl</a>：command line tool and library for transferring data with URLs</p>
+<p><a href="https://www.gitbook.com/book/bagder/everything-curl/details" target="_blank" rel="noopener">Everything cUrl 下载地址</a></p>
+<p>cURL是一个利用URL语法在命令行下工作的文件传输工具，1997年首次发行。它支持文件上传和下载，所以是综合传输工具，但按传统，习惯<strong>称cURL为下载工具</strong>。cURL还包含了用于程序开发的libcurl。  </p>
+<p>cURL支持的通信协议有FTP、FTPS、HTTP、HTTPS、TFTP、SFTP、Gopher、SCP、Telnet、DICT、FILE、LDAP、LDAPS、IMAP、POP3、SMTP和RTSP。  </p>
+<p>libcurl支持的平台有Solaris、NetBSD、FreeBSD、OpenBSD、Darwin、HP-UX、IRIX、AIX、Tru64、Linux、UnixWare、HURD、Windows、Symbian、Amiga、OS/2、BeOS、Mac OS X、Ultrix、QNX、BlackBerry Tablet OS、OpenVMS、RISC OS、Novell NetWare、DOS等。  </p>
+<h3 id="cUrl-使用方法"><a href="#cUrl-使用方法" class="headerlink" title="cUrl 使用方法"></a>cUrl 使用方法</h3><h4 id="1-下载单个文件，默认将输出打印到标准输出（stdout）中（或者说：查看网页源码）"><a href="#1-下载单个文件，默认将输出打印到标准输出（stdout）中（或者说：查看网页源码）" class="headerlink" title="1. 下载单个文件，默认将输出打印到标准输出（stdout）中（或者说：查看网页源码）"></a>1. 下载单个文件，默认将输出打印到标准输出（stdout）中（或者说：查看网页源码）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://www.baidu.com</span><br></pre></td></tr></table></figure>
+<h4 id="2-通过-o-O-选项保存下载的文件到指定的文件中：（类似于-wget-功能）"><a href="#2-通过-o-O-选项保存下载的文件到指定的文件中：（类似于-wget-功能）" class="headerlink" title="2. 通过 -o/-O 选项保存下载的文件到指定的文件中：（类似于 wget 功能）"></a>2. 通过 -o/-O 选项保存下载的文件到指定的文件中：（类似于 wget 功能）</h4><blockquote>
+<p>-o：将文件保存为命令行中指定文件名的文件中<br>-O：使用 URL 中默认的文件名保存文件到本地</p>
+</blockquote>
+<pre><code>// 将文件下载到本地并命名为 java-files-io.html
+curl -o java-files-io.html http://www.runoob.com/java/java-files-io.html
+
+// 将文件下载到本地，使用 URL 中的文件名命名
+curl -O http://www.runoob.com/java/java-files-io.html
+</code></pre><p>同样可以使用重定向字符 “&gt;” 对输出进行转向输出。</p>
+<h4 id="3-同时获取多个文件"><a href="#3-同时获取多个文件" class="headerlink" title="3. 同时获取多个文件"></a>3. 同时获取多个文件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -o file1.html URL1 -o file2.html URL2</span><br></pre></td></tr></table></figure>
+<p>若同时从同一站点下载多个文件时，curl会尝试重用链接(connection)。</p>
+<h4 id="4-通过-L-选项进行自动跳转"><a href="#4-通过-L-选项进行自动跳转" class="headerlink" title="4. 通过 -L 选项进行自动跳转"></a>4. 通过 -L 选项进行自动跳转</h4><p>通过-L选项进行重定向  </p>
+<p>默认情况下CURL不会发送HTTP Location headers(重定向).当一个被请求页面移动到另一个站点时，会发送一个HTTP Loaction header作为请求，然后将请求重定向到新的地址上。  </p>
+<p>例如：访问google.com时，会自动将地址重定向到google.com.hk上。</p>
+<pre><code>curl http://www.google.com
+
+&lt;HTML&gt;
+    &lt;HEAD&gt;
+        &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html;charset=utf-8&quot;&gt;
+        &lt;TITLE&gt;302 Moved&lt;/TITLE&gt;
+    &lt;/HEAD&gt;
+    &lt;BODY&gt;
+        &lt;H1&gt;302 Moved&lt;/H1&gt;
+        The document has moved
+        &lt;A HREF=&quot;http://www.google.com.hk/?gfe_rd=cr&amp;amp;ei=F3VHWcDuHcvU8Afr-r-YAw&quot;&gt;here&lt;/A&gt;.
+    &lt;/BODY&gt;
+&lt;/HTML&gt;
+</code></pre><p>上述输出说明所请求的档案被转移到了<a href="http://www.google.com.hk。" target="_blank" rel="noopener">http://www.google.com.hk。</a><br>这里可以使用 -L 选项进行重定向<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">## 让 curl 使用重定向地址，此时会查询 google.com.hk 站点</span><br><span class="line">curl -L http://www.google.com</span><br></pre></td></tr></table></figure></p>
+<h4 id="5-断点续传"><a href="#5-断点续传" class="headerlink" title="5. 断点续传"></a>5. 断点续传</h4><p>通过使用 -C 选项可对大文件使用断点续传功能，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 当文件在下载完成之前结束该进程</span><br><span class="line">curl -O http://www.runoob.com/java/java-files-io.html</span><br><span class="line">######    20.1%</span><br><span class="line"></span><br><span class="line">## 通过添加 -C 选项继续对该文件进行下载，已经下载过的文件不会被重新下载</span><br><span class="line">curl -C - -O http://www.runoob.com/java/java-files-io.html</span><br></pre></td></tr></table></figure></p>
+<h4 id="6-对-cUrl-使用网络限速"><a href="#6-对-cUrl-使用网络限速" class="headerlink" title="6. 对 cUrl 使用网络限速"></a>6. 对 cUrl 使用网络限速</h4><p>通过 –limit-rate 选项对 cUrl 的最大网络使用进行限制<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">## 下载速度最大不超过 1000B/s</span><br><span class="line">curl --limit-rate 1000B -O http://www.runoob.com/java/java-files-io.html</span><br></pre></td></tr></table></figure></p>
+<h4 id="7-下载指定时间内修改过的文件"><a href="#7-下载指定时间内修改过的文件" class="headerlink" title="7. 下载指定时间内修改过的文件"></a>7. 下载指定时间内修改过的文件</h4><p>当下载一个文件时，可对该文件的最后修改日期进行判断，如果该文件在指定日期内修改过，就进行下载，否则不下载。<br>改功能可通过使用 -z 选项来实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">## java-files-io.html 若在 2017-06-19 之后修改过才会进行下载</span><br><span class="line">curl -z 19-June-17 http://www.runoob.com/java/java-files-io.html</span><br></pre></td></tr></table></figure></p>
+<h4 id="8-HTTP认证"><a href="#8-HTTP认证" class="headerlink" title="8. HTTP认证"></a>8. HTTP认证</h4><p>有些网域需要HTTP认证，这时curl需要用到<code>--user</code>参数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -u username:password URL</span><br><span class="line"></span><br><span class="line">## 通常的做法是在命令行只输入用户名，之后会提示输入密码，这样可以保证在查看历史记录时不会将密码泄露</span><br><span class="line">curl -u username URL</span><br></pre></td></tr></table></figure></p>
+<h4 id="9-显示头信息"><a href="#9-显示头信息" class="headerlink" title="9. 显示头信息"></a>9. 显示头信息</h4><p>-i 参数可以显示 http response 的头信息，连同网页代码一起<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -i www.sina.com</span><br></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">TP/1.1 301 Moved Permanently</span><br><span class="line">Server: nginx</span><br><span class="line">Date: Mon, 19 Jun 2017 11:55:10 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Location: http://www.sina.com.cn/</span><br><span class="line">Expires: Mon, 19 Jun 2017 11:57:10 GMT</span><br><span class="line">Cache-Control: max-age=120</span><br><span class="line">Age: 64</span><br><span class="line">Content-Length: 178</span><br><span class="line">X-Cache: HIT from ctc.yongfeng.sinacache.181.nb.sinaedge.com.sina.com.cn</span><br><span class="line"></span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;301 Moved Permanently&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body bgcolor=&quot;white&quot;&gt;</span><br><span class="line">&lt;center&gt;&lt;h1&gt;301 Moved Permanently&lt;/h1&gt;&lt;/center&gt;</span><br><span class="line">&lt;hr&gt;&lt;center&gt;nginx&lt;/center&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<h4 id="10-显示通信过程"><a href="#10-显示通信过程" class="headerlink" title="10. 显示通信过程"></a>10. 显示通信过程</h4><p>-v 参数可以显示一次 http 通信的过程，包括端口连接和 http request 头信息。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -v www.sina.com</span><br></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">Connected to www.sina.com (218.30.108.226) port 80 (#0)</span><br><span class="line">&gt; GET / HTTP/1.1</span><br><span class="line">&gt; Host: www.sina.com</span><br><span class="line">&gt; User-Agent: curl/7.53.0</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt;</span><br><span class="line">&lt; HTTP/1.1 301 Moved Permanently</span><br><span class="line">&lt; Server: nginx</span><br><span class="line">&lt; Date: Mon, 19 Jun 2017 11:58:56 GMT</span><br><span class="line">&lt; Content-Type: text/html</span><br><span class="line">&lt; Location: http://www.sina.com.cn/</span><br><span class="line">&lt; Expires: Mon, 19 Jun 2017 12:00:56 GMT</span><br><span class="line">&lt; Cache-Control: max-age=120</span><br><span class="line">&lt; Age: 10</span><br><span class="line">&lt; Content-Length: 178</span><br><span class="line">&lt; X-Cache: HIT from ctc.yongfeng.sinacache.180.nb.sinaedge.com.sina.com.cn</span><br><span class="line">&lt;</span><br><span class="line">  0   178    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0&#123; [178 bytes data]</span><br><span class="line">100   178  100   178    0     0    633      0 --:--:-- --:--:-- --:--:--   671&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;301 Moved Permanently&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body bgcolor=&quot;white&quot;&gt;</span><br><span class="line">&lt;center&gt;&lt;h1&gt;301 Moved Permanently&lt;/h1&gt;&lt;/center&gt;</span><br><span class="line">&lt;hr&gt;&lt;center&gt;nginx&lt;/center&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br><span class="line">* Connection #0 to host www.sina.com left intact</span><br></pre></td></tr></table></figure></p>
+<p>如果你觉得上面的信息还不够，那么下面的命令可以查看更详细的通信过程。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --trace output.txt URL</span><br></pre></td></tr></table></figure></p>
+<h4 id="11-发送表单信息"><a href="#11-发送表单信息" class="headerlink" title="11. 发送表单信息"></a>11. 发送表单信息</h4><p>发送表单信息有GET和POST两种方法。GET方法相对简单，只要把数据附在网址后面就行。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl example.com/form.cgi?data=xxx</span><br></pre></td></tr></table></figure></p>
+<p>POST方法必须把数据和网址分开，curl就要用到–data参数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST --data &quot;data=xxx&quot; example.com/form.cgi</span><br></pre></td></tr></table></figure></p>
+<p>如果你的数据没有经过表单编码，还可以让curl为你编码，参数是<code>--data-urlencode</code>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST--data-urlencode &quot;date=April 1&quot; example.com/form.cgi</span><br></pre></td></tr></table></figure></p>
+<h4 id="12-HTTP动词"><a href="#12-HTTP动词" class="headerlink" title="12. HTTP动词"></a>12. HTTP动词</h4><p>curl默认的HTTP动词是GET，使用<code>-X</code>参数可以支持其他动词。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST www.example.com</span><br><span class="line">curl -X DELETE www.example.com</span><br></pre></td></tr></table></figure></p>
+<h4 id="13-文件上传"><a href="#13-文件上传" class="headerlink" title="13. 文件上传"></a>13. 文件上传</h4><p>假定文件上传的表单是下面这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">　　&lt;form method=&quot;POST&quot; enctype=&apos;multipart/form-data&apos; action=&quot;upload.cgi&quot;&gt;</span><br><span class="line">　　　　&lt;input type=file name=upload&gt;</span><br><span class="line">　　　　&lt;input type=submit name=press value=&quot;OK&quot;&gt;</span><br><span class="line">　　&lt;/form&gt;</span><br></pre></td></tr></table></figure></p>
+<p>你可以用curl这样上传文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --form upload=@localfilename --form press=OK [URL]</span><br></pre></td></tr></table></figure></p>
+<h4 id="14-Referer字段"><a href="#14-Referer字段" class="headerlink" title="14. Referer字段"></a>14. Referer字段</h4><p>有时你需要在http request头信息中，提供一个referer字段，表示你是从哪里跳转过来的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --referer http://www.example.com http://www.example.com</span><br></pre></td></tr></table></figure></p>
+<h4 id="15-User-Agent字段"><a href="#15-User-Agent字段" class="headerlink" title="15. User Agent字段"></a>15. User Agent字段</h4><p>这个字段是用来表示客户端的设备信息。服务器有时会根据这个字段，针对不同设备，返回不同格式的网页，比如手机版和桌面版。<br>iPhone4的User Agent是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7</span><br></pre></td></tr></table></figure></p>
+<p>curl可以这样模拟：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --user-agent &quot;[User Agent]&quot; [URL]</span><br></pre></td></tr></table></figure></p>
+<h4 id="16-cookie"><a href="#16-cookie" class="headerlink" title="16. cookie"></a>16. cookie</h4><p>使用<code>--cookie</code>参数，可以让curl发送cookie。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --cookie &quot;name=xxx&quot; www.example.com</span><br></pre></td></tr></table></figure></p>
+<p>至于具体的cookie的值，可以从http response头信息的<code>Set-Cookie</code>字段中得到。</p>
+<p><code>-c cookie-file</code>可以保存服务器返回的cookie到文件，<code>-b cookie-file</code>可以使用这个文件作为cookie信息，进行后续的请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -c cookies http://example.com</span><br><span class="line">curl -b cookies http://example.com</span><br></pre></td></tr></table></figure></p>
+<h4 id="17-增加头信息"><a href="#17-增加头信息" class="headerlink" title="17. 增加头信息"></a>17. 增加头信息</h4><p>有时需要在http request之中，自行增加一个头信息。<code>--header</code>参数就可以起到这个作用。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --header &quot;Content-Type:application/json&quot; http://example.com</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/17/CDN 加速域名和源域名/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lanqiu5ge">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/profile_pic.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YSCONTIGO'S REST HOME">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/17/CDN 加速域名和源域名/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-17T13:00:02+08:00">
+                2017-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>域名分为很多种，如果按照种类划分可以按照地域划分、按照语种划分、按照机构划分；如果按照域名级别划分，那么可以分为顶级域名、二级域名、三级域名。这 些域名都是可以用来做加速域名和源站域名的。需要强调的是，有些顶级域名不能做加速的原因是域名服务提供商会不允许顶级域名做CNAME切换，这个可以通过修改DNS解析 权限来解决，或者直接联系域名服务提供商。  </p>
+<p>CDN是以域名为单位进行加速的，那么用来进行加速的域名称之为加速域名；用来解析出源站IP的域名称之为源站域名。所以，加速域名和源站域名一定不可以相同。  </p>
+<p>在CDN加速中，加速域名是必须要有的，源站域名可以用源站IP来代替。<br>使用源站域名的好处在于，当网站要更换主机IP时，可以在不修改CDN配置的情况下，只修改自己的源站解析方式即可。个人感觉，对于经常修改源站IP的网站，还是用域名回源比较方便。</p>
+<h4 id="什么是-CNAME？"><a href="#什么是-CNAME？" class="headerlink" title="什么是 CNAME？"></a>什么是 CNAME？</h4>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/13/Jstack 定位性能问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lanqiu5ge">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/profile_pic.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YSCONTIGO'S REST HOME">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/13/Jstack 定位性能问题/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-13T10:02:46+08:00">
+                2017-06-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="巧用-jstack-定位性能问题"><a href="#巧用-jstack-定位性能问题" class="headerlink" title="巧用 jstack 定位性能问题"></a>巧用 jstack 定位性能问题</h2><p>在Java应用的性能测试中，很多性能问题可以通过观察线程堆栈来发现，Jstack是JVM自带dump线程堆栈的工具，很轻量易用，并且执行时不会对性能造成很大的影响。灵活的使用jstack可以发现很多隐秘的性能问题，是定位问题不可多得的好帮手。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/12/Nginx 分享 笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lanqiu5ge">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/profile_pic.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YSCONTIGO'S REST HOME">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/12/Nginx 分享 笔记/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-12T00:23:46+08:00">
+                2017-06-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Nginx-分享PPT-可参考资料"><a href="#Nginx-分享PPT-可参考资料" class="headerlink" title="Nginx 分享PPT 可参考资料"></a>Nginx 分享PPT 可参考资料</h3><blockquote>
+<p>分享要达到的目的：都能理解一个 http请求到达 Nginx 后，整个处理流程（经过哪些模块，处理顺序，每个模块都干了啥；总结结构是：先理论阐述各个模块，然后最后结合实例串联）</p>
+</blockquote>
+<ol>
+<li><a href="http://blog.csdn.net/poechant/article/details/7174990" target="_blank" rel="noopener">Location 常用指令</a></li>
+<li><a href="http://blog.csdn.net/poechant/article/details/7173843" target="_blank" rel="noopener">Http 模块基本常用指令</a></li>
+<li><a href="http://blog.csdn.net/poechant/article/details/7256184" target="_blank" rel="noopener">upstream 负载均衡模块</a></li>
+</ol>
 
           
         
@@ -1034,7 +1738,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">文章</span>
                 </a>
               </div>
@@ -1104,7 +1808,7 @@
 
 
 
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
 
 
 
