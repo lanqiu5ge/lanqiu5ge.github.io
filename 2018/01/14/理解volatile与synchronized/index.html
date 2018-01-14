@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Java,Spring,Autowire," />
+  <meta name="keywords" content="Java,concurrent,volatile,synchronized," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="最近在开发的时候，使用 @Autowired 注解 Field，发现 IDE 报了一个警告，如下： 1Spring Team recommends &amp;quot;Always use constructor based dependency injection in your beans. Always use assertions for mandatory dependencies&amp;quot;.">
-<meta name="keywords" content="Java,Spring,Autowire">
+<meta name="description" content="用 volatile 修饰的变量可以保证线程的“可见性”，也就是，任何线程修改了这个 volatile 修饰的值都会通知其他线程来主缓存中重新读取值。">
+<meta name="keywords" content="Java,concurrent,volatile,synchronized">
 <meta property="og:type" content="article">
-<meta property="og:title" content="深究推荐 @Autowired 对构造函数注解的原因">
-<meta property="og:url" content="http://yoursite.com/2017/11/10/2017-10-26-@Autowired 推荐构造函数注入/index.html">
+<meta property="og:title" content="理解volatile与synchronized">
+<meta property="og:url" content="http://yoursite.com/2018/01/14/理解volatile与synchronized/index.html">
 <meta property="og:site_name" content="YSCONTIGO&#39;S 点滴">
-<meta property="og:description" content="最近在开发的时候，使用 @Autowired 注解 Field，发现 IDE 报了一个警告，如下： 1Spring Team recommends &amp;quot;Always use constructor based dependency injection in your beans. Always use assertions for mandatory dependencies&amp;quot;.">
+<meta property="og:description" content="用 volatile 修饰的变量可以保证线程的“可见性”，也就是，任何线程修改了这个 volatile 修饰的值都会通知其他线程来主缓存中重新读取值。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-14T16:21:30.195Z">
+<meta property="og:updated_time" content="2018-01-14T16:55:32.254Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="深究推荐 @Autowired 对构造函数注解的原因">
-<meta name="twitter:description" content="最近在开发的时候，使用 @Autowired 注解 Field，发现 IDE 报了一个警告，如下： 1Spring Team recommends &amp;quot;Always use constructor based dependency injection in your beans. Always use assertions for mandatory dependencies&amp;quot;.">
+<meta name="twitter:title" content="理解volatile与synchronized">
+<meta name="twitter:description" content="用 volatile 修饰的变量可以保证线程的“可见性”，也就是，任何线程修改了这个 volatile 修饰的值都会通知其他线程来主缓存中重新读取值。">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/11/10/2017-10-26-@Autowired 推荐构造函数注入/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/01/14/理解volatile与synchronized/"/>
 
 
 
 
 
-  <title>深究推荐 @Autowired 对构造函数注解的原因 | YSCONTIGO'S 点滴</title>
+  <title>理解volatile与synchronized | YSCONTIGO'S 点滴</title>
   
 
 
@@ -311,7 +311,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/10/2017-10-26-@Autowired 推荐构造函数注入/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/14/理解volatile与synchronized/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="lanqiu5ge">
@@ -328,7 +328,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">深究推荐 @Autowired 对构造函数注解的原因</h1>
+          <h1 class="post-title" itemprop="name headline">理解volatile与synchronized</h1>
         
 
         <div class="post-meta">
@@ -340,8 +340,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-10T00:00:00+08:00">
-                2017-11-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-14T00:00:00+08:00">
+                2018-01-14
               </time>
             
 
@@ -356,7 +356,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-01-15T00:21:30+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2018-01-15T00:55:32+08:00">
                 2018-01-15
               </time>
             
@@ -375,8 +375,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -394,8 +394,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/11/10/2017-10-26-@Autowired 推荐构造函数注入/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count hc-comment-count" data-xid="2017/11/10/2017-10-26-@Autowired 推荐构造函数注入/" itemprop="commentsCount"></span>
+                <a href="/2018/01/14/理解volatile与synchronized/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2018/01/14/理解volatile与synchronized/" itemprop="commentsCount"></span>
                 </a>
               </span>
               <!--/noindex-->
@@ -424,52 +424,17 @@
       
 
       
-        <p>最近在开发的时候，使用 @Autowired 注解 Field，发现 IDE 报了一个警告，如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Spring Team recommends &quot;Always use constructor based dependency injection in your beans. Always use assertions for mandatory dependencies&quot;.</span><br></pre></td></tr></table></figure>
-<p>翻译后的大概意思就是：<br>Spring 团队建议：总是在您的 bean 中使用构造函数建立依赖注入。总是使用断言强制依赖。</p>
+        <p>用 volatile 修饰的变量可以保证线程的“可见性”，也就是，任何线程修改了这个 volatile 修饰的值都会通知其他线程来主缓存中重新读取值。</p>
 <a id="more"></a>
-<p>原来的写法是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Controller</span><br><span class="line">public class UserController &#123;</span><br><span class="line">	@Autowired</span><br><span class="line">	private UserService userService;</span><br><span class="line"></span><br><span class="line">	@RequestMapping(value = &quot;/get&quot;)</span><br><span class="line">	public @ResponseBody getUser()</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">这样写就会出现上边那个警告。</span><br><span class="line">按照 Spring 团队建议的写法是：</span><br></pre></td></tr></table></figure>
-<p>public class A {<br>    /**</p>
-<pre><code> *    注意多添加了一个 final 修饰
- */
-private final B b；
-
-@Autowired
-public A(B b) {
-    this.b = b;
-}
-...
-</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@Autowired 明明可以对 Constructor，Fileld， Setter Methods or config Methods 进行注释。</span><br><span class="line">那么为什么这里有这样的提示？对 Field 和 对 Constructor 进行注释有什么区别呢？</span><br><span class="line"></span><br><span class="line">为了解答以上疑惑，还得结合 JVM 中对 Java 变量的初始化顺序进行分析：</span><br><span class="line">**Java变量的初始化顺序为：**</span><br><span class="line">静态变量或静态语句块 –&gt; 实例变量或初始化语句块 –&gt; 构造方法 –&gt; @Autowired</span><br><span class="line"></span><br><span class="line">所以，若有如下代码：</span><br><span class="line"></span><br><span class="line">B.java 文件</span><br></pre></td></tr></table></figure></p>
-<p>@Getter<br>@Setter<br>@Service<br>public class B {</p>
-<pre><code>private String name;
-
-private int age;
-
-public User(){}
-
-public User(String name, int age) {
-    this.name = name;
-    this.age = age;
-}
-
-@Override
-public String toString() {
-    return &quot;Name=&quot; + name + &quot;, Age=&quot; + age;
- }
-</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">A.java 文件</span><br></pre></td></tr></table></figure></p>
-<p>public class A {<br>    private String name;</p>
-<pre><code>@Autowired
-private B b;
-
-public A() {
-    this.name = b.getName();    
-}
-...
-</code></pre><p>}<br>```</p>
-<p>能正常完成编译，但是运行时会抛出 NPE。</p>
-<p>被 @Autowired 注解的 Field 的底层注入流程可以理解为在配置文件中配置 bean，然后使用 setter 注入。<br>而被 @Autowired 注解的 Constructor 的底层注入流程就相当于是使用构造函数进行依赖注入了。</p>
-
+<p>下面通过例子加以说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class VolatileTest &#123;</span><br><span class="line">    // 对比有无 volatile 关键字的区别</span><br><span class="line">    volatile boolean running = true;</span><br><span class="line"></span><br><span class="line">    public void m()&#123;</span><br><span class="line">        System.out.println(&quot;start run&quot;);</span><br><span class="line">        while (running)&#123;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;end run&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        VolatileTest volatileTest = new VolatileTest();</span><br><span class="line">        new Thread(volatileTest::m, &quot;t1&quot;).start();</span><br><span class="line">        try &#123;</span><br><span class="line">            //主线程睡眠一秒钟，目的是保证t1获得cpu执行权</span><br><span class="line">            TimeUnit.SECONDS.sleep(1);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        volatileTest.running = false;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">有volatile的情况下，程序会输出:</span><br><span class="line">start run</span><br><span class="line">end run</span><br><span class="line">无volatile的情况下，程序会输出:</span><br><span class="line">start run</span><br></pre></td></tr></table></figure>
+<p>出现这种情况的原因跟java的内存模型（JMM）有关，每个线程运行都有自己独立的一份内存，用于保存线程的局部变量，线程修改一个全局变量要经过三个过程：</p>
+<p>i. 拷贝主内存的变量到线程内存。</p>
+<p>ii. 修改拷贝的变量值。</p>
+<p>iii. 把修改的值写回主内存。</p>
+<p>由于线程修改一个公共变量需要这三个步骤，可见这个修改不具备“原子性”，这也就是volatile和synchronized的不同之处，volatile不能取代synchronized来使用。  </p>
+<p>如下面例子所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">public class VolatleAndSynchornized &#123;</span><br><span class="line">    public volatile int count = 0;</span><br><span class="line">    </span><br><span class="line">//    public synchronized void incre()&#123;</span><br><span class="line">     public void incre()&#123;</span><br><span class="line">        for (int i = 0; i &lt; 10000; i ++)&#123;</span><br><span class="line">            count ++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        VolatleAndSynchornized obj = new VolatleAndSynchornized();</span><br><span class="line">        obj.process();</span><br><span class="line">        System.out.println(obj.count);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public void process() &#123;</span><br><span class="line">        List&lt;Thread&gt; threads = new ArrayList&lt;&gt;();</span><br><span class="line">        for (int i = 0; i &lt; 5; i ++) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                Runner t = new Runner();</span><br><span class="line">                threads.add(t);</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        threads.forEach(Thread::start);</span><br><span class="line">    </span><br><span class="line">        threads.forEach(thread -&gt; &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                thread.join();</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public class Runner extends Thread &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            incre();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">用volatile的话输出：(每次运行结果不见得相同)</span><br><span class="line">24236</span><br><span class="line">而用synchronized的话输出：</span><br><span class="line">50000</span><br></pre></td></tr></table></figure>
       
     </div>
     
@@ -488,9 +453,11 @@ public A() {
           
             <a href="/tags/Java/" rel="tag"># Java</a>
           
-            <a href="/tags/Spring/" rel="tag"># Spring</a>
+            <a href="/tags/concurrent/" rel="tag"># concurrent</a>
           
-            <a href="/tags/Autowire/" rel="tag"># Autowire</a>
+            <a href="/tags/volatile/" rel="tag"># volatile</a>
+          
+            <a href="/tags/synchronized/" rel="tag"># synchronized</a>
           
         </div>
       
@@ -503,8 +470,8 @@ public A() {
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/05/linux指令-cUrl/" rel="next" title="【每天一个Linux指令】cUrl">
-                <i class="fa fa-chevron-left"></i> 【每天一个Linux指令】cUrl
+              <a href="/2017/11/22/2017-10-26-Mac Pro 使用小技巧/" rel="next" title="Mac Pro 使用小技巧">
+                <i class="fa fa-chevron-left"></i> Mac Pro 使用小技巧
               </a>
             
           </div>
@@ -512,10 +479,6 @@ public A() {
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/11/22/2017-10-26-Mac Pro 使用小技巧/" rel="prev" title="Mac Pro 使用小技巧">
-                Mac Pro 使用小技巧 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -875,7 +838,7 @@ public A() {
 		_hcwp.push({widget:"Bloggerstream", widget_id: 99983, selector:".hc-comment-count", label: "{\%COUNT%\}" });
 
 		
-		_hcwp.push({widget:"Stream", widget_id: 99983, xid: "2017/11/10/2017-10-26-@Autowired 推荐构造函数注入/"});
+		_hcwp.push({widget:"Stream", widget_id: 99983, xid: "2018/01/14/理解volatile与synchronized/"});
 		
 
 		(function() {
